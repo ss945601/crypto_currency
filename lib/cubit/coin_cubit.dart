@@ -30,14 +30,15 @@ class CoinCubit extends Cubit<CoinState> {
   }
 
   void _buildCoinListener() {
-    print(coinsMap.keys.join(','));
     _channel = WebSocketChannel.connect(
       Uri.parse('wss://ws.coincap.io/prices?assets=${coinsMap.keys.join(',')}'),
     );
     _channel.stream.listen((event) {
       var prices = Map<String, String>.from(json.decode(event));
       prices.forEach((key, value) {
+        coinsMap[key]?.changePrice = (double.tryParse(value)! - double.tryParse(coinsMap[key]!.priceUsd)!);
         coinsMap[key]?.priceUsd = value;
+        coinsMap[key]?.priceHistory[DateTime.now()] = double.tryParse(value) ?? 0.0;
       });
       emit(CoinLoaded(coinMap: coinsMap));
     });

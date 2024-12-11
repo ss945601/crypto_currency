@@ -11,6 +11,8 @@ class CoinInfo {
     String changePercent24Hr;
     String vwap24Hr;
     String explorer;
+    Map<DateTime,double> priceHistory = {};
+    double changePrice = 0;
 
     CoinInfo({
         required this.id,

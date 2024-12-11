@@ -1,9 +1,9 @@
 import 'package:crypto_currency/cubit/coin_cubit.dart';
+import 'package:crypto_currency/pages/price_screen.dart';
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
 
-// UI
 void main() {
   runApp(MyApp());
 }
@@ -12,44 +12,70 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Crypto Prices',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: BlocProvider(
-        create: (context) => CoinCubit(),
-        child: PriceScreen(),
-      ),
+      title: 'Crypto Currency',
+      theme: FlexThemeData.light(scheme: FlexScheme.deepBlue,),
+      // The Mandy red, dark theme.
+      darkTheme: FlexThemeData.dark(scheme: FlexScheme.mandyRed),
+      // Use dark or light theme based on system setting.
+      themeMode: ThemeMode.light,
+      home: MyHomePage(),
     );
   }
 }
 
-class PriceScreen extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  Widget _currentScreen = PriceScreen();
+
+  void _switchScreen(Widget screen) {
+    setState(() {
+      _currentScreen = screen;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Crypto Prices'),
+        title: Text('Crypto Currency'),
+        centerTitle: true,
       ),
-      body: BlocBuilder<CoinCubit, CoinState>(
-        builder: (context, state) {
-          if (state is CoinLoading) {
-            return Center(child: CircularProgressIndicator());
-          } else if (state is CoinLoaded) {
-            return ListView(
-              children: state.coinMap.entries
-                  .map((entry) => ListTile(
-                        title: Text(entry.key.toUpperCase()),
-                        subtitle: Text('Price: \$${entry.value.priceUsd}'),
-                      ))
-                  .toList(),
-            );
-          } else if (state is CoinError) {
-            return Center(child: Text('Error: ${state.message}'));
-          } else {
-            return Center(child: Text('No data available'));
-          }
-        },
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              margin: EdgeInsets.zero,
+              padding: EdgeInsets.zero,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primaryContainer,
+              ),
+              child: Center(
+                child: Text(
+                  'Crypto Menu',
+                ),
+              ),
+            ),
+            Expanded(
+              child: ListTile(
+                leading: Icon(Icons.attach_money),
+                title: Text('Current Price'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _switchScreen(PriceScreen());
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+      body: BlocProvider(
+        create: (context) => CoinCubit(),
+        child: _currentScreen,
       ),
     );
   }

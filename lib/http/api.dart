@@ -1,6 +1,18 @@
 import 'package:crypto_currency/http/domain.dart';
 import 'package:dio/dio.dart';
 
+enum CoinApi {
+  assets;
+  String get value {
+    switch (this) {
+      case assets:
+        return '/v2/assets/';
+      default:
+        return '';
+    }
+  }
+}
+
 class Api {
   // Private constructor
   Api._privateConstructor();
@@ -15,7 +27,7 @@ class Api {
 
   // Example method
   Future<Map<String, dynamic>?> getCoinInfoList() async {
-    var ret = await Dio().get(Domain.instance.coinGap + "/v2/assets");
+    var ret = await Dio().get(Domain.instance.coinGap + CoinApi.assets.value);
     if (ret.data != null) {
       return ret.data;
     }
