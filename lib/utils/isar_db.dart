@@ -19,8 +19,27 @@ class IsarDataBase {
 
   // Initialize Isar database
   Future<void> init() async {
-    final dir = await Directory.systemTemp.createTemp();
-    _isar = Isar.open(schemas: [CoinDataSchema], directory: dir.path);
+  // Get the system's temporary directory
+  final tempDir = Directory.systemTemp;
+
+  // Define the name of the folder you want to create
+  final folderName = 'isar_db';
+
+  // Create the full path for the new folder
+  final newFolderPath = '${tempDir.path}/$folderName';
+
+  // Create a Directory object for the new folder
+  final newFolder = Directory(newFolderPath);
+
+  // Check if the directory exists
+  if (await newFolder.exists()) {
+    print('Directory already exists: $newFolderPath');
+  } else {
+    // If it doesn't exist, create it
+    await newFolder.create();
+    print('Directory created: $newFolderPath');
+  }
+    _isar = Isar.open(schemas: [CoinDataSchema], directory: newFolderPath);
   }
 
   Isar get isar => _isar;
