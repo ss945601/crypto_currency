@@ -1,10 +1,14 @@
 import 'package:crypto_currency/cubit/coin_cubit.dart';
 import 'package:crypto_currency/pages/price_screen.dart';
+import 'package:crypto_currency/utils/isar_db.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-void main() {
+Future<void> main() async {
+  final repository = IsarDataBase();
+  // Initialize the database
+  await repository.init();
   runApp(MyApp());
 }
 
@@ -17,7 +21,7 @@ class MyApp extends StatelessWidget {
       // The Mandy red, dark theme.
       darkTheme: FlexThemeData.dark(scheme: FlexScheme.mandyRed),
       // Use dark or light theme based on system setting.
-      themeMode: ThemeMode.light,
+      themeMode: ThemeMode.dark,
       home: MyHomePage(),
     );
   }
