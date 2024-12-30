@@ -1,3 +1,6 @@
+import 'package:crypto_currency/class/coin_data.dart';
+import 'package:interactive_chart/interactive_chart.dart';
+
 class CoinInfo {
     String id;
     String rank;
@@ -58,4 +61,68 @@ class CoinInfo {
         "vwap24Hr": vwap24Hr,
         "explorer": explorer,
     };
+}
+
+
+Map<String, List<CandleData>> calculateOHLCWithInterval(
+    Map<String, List<CoinData>> groupedData, Duration interval) {
+  // Group data by coinId
+  final result = <String, List<CandleData>>{};
+
+  for (var entry in groupedData.entries) {
+    final coinId = entry.key;
+    final data = entry.value;
+
+    // Sort data by timestamp
+    data.sort((a, b) => a.timestamp!.compareTo(b.timestamp!));
+
+    final candles = <CandleData>[];
+    DateTime? currentIntervalStart;
+    List<CoinData> currentIntervalData = [];
+
+    for (var coin in data) {
+      final timestamp = coin.timestamp!;
+      if (currentIntervalStart == null ||
+          timestamp.isAfter(currentIntervalStart.add(interval))) {
+        // Finalize the previous interval
+        if (currentIntervalData.isNotEmpty) {
+          candles.add(_generateCandleData(currentIntervalStart!, currentIntervalData));
+        }
+
+        // Start a new interval
+        currentIntervalStart =
+            DateTime(timestamp.year, timestamp.month, timestamp.day, timestamp.hour, timestamp.minute)
+                .add(Duration(minutes: -(timestamp.minute % interval.inMinutes)));
+        currentIntervalData = [];
+      }
+
+      currentIntervalData.add(coin);
+    }
+
+    // Finalize the last interval
+    if (currentIntervalData.isNotEmpty && currentIntervalStart != null) {
+      candles.add(_generateCandleData(currentIntervalStart, currentIntervalData));
+    }
+
+    result[coinId] = candles;
+  }
+
+  return result;
+}
+
+CandleData _generateCandleData(DateTime start, List<CoinData> data) {
+  final open = data.first.price!;
+  final close = data.last.price!;
+  final high = data.map((e) => e.price!).reduce((a, b) => a > b ? a : b);
+  final low = data.map((e) => e.price!).reduce((a, b) => a < b ? a : b);
+  final volume = data.length.toDouble(); // Example volume as count
+
+  return CandleData(
+    timestamp: start.millisecondsSinceEpoch,
+    open: open,
+    high: high,
+    low: low,
+    close: close,
+    volume: volume,
+  );
 }
