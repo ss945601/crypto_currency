@@ -20,6 +20,14 @@ final class CoinLoaded extends CoinState {
   List<Object> get props => [identityHashCode(this)];
 }
 
+final class CoinUpdateInterval extends CoinState {
+  final Duration interval;
+
+  const CoinUpdateInterval({required this.interval});
+  @override
+  List<Object> get props => [interval];
+}
+
 final class CoinError extends CoinState {
   final String message;
 

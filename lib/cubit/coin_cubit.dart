@@ -70,6 +70,10 @@ class CoinCubit extends Cubit<CoinState> {
     return calculateOHLCWithInterval(groupedData, interval)[coinId] ?? [];
   }
 
+  void updateInterval(Duration interval) {
+    emit(CoinUpdateInterval(interval: interval));
+  }
+
   void _buildCoinListener() {
     var isar = IsarDataBase().isar;
     _channel = WebSocketChannel.connect(

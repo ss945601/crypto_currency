@@ -3,57 +3,100 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:interactive_chart/interactive_chart.dart';
+import 'package:toggle_switch/toggle_switch.dart';
 
 class PriceScreen extends StatelessWidget {
+  int intervalIdx = 0;
+  var coinMap = {};
+  var intervalMin = 1;
   @override
   Widget build(BuildContext context) {
     var _cubit = context.read<CoinCubit>();
+
     return BlocBuilder<CoinCubit, CoinState>(
       builder: (context, state) {
         if (state is CoinLoading) {
           return Center(child: CircularProgressIndicator());
-        } else if (state is CoinLoaded) {
-          return ListView(
-            children: state.coinMap.entries.map((entry) {
-              var candles = _cubit.getCandleDataList(
-                  entry.value.id, const Duration(minutes: 1));
-              return ExpansionTile(
-                title: Text(entry.key.toUpperCase()),
-                subtitle: RichText(
-                  text: TextSpan(children: [
-                    TextSpan(
-                      text: 'Price: \$${entry.value.priceUsd} ',
-                    ),
-                    TextSpan(
-                      style: TextStyle(
-                          color: entry.value.changePrice > 0
-                              ? Colors.green
-                              : Colors.red),
-                      text:
-                          '${entry.value.changePrice > 0 ? '+' : ''} ${entry.value.changePrice.toStringAsFixed(6)}',
-                    )
-                  ]),
-                ),
-                children: [
-                  SizedBox(
-                    height: 400,
-                    child: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: candles.length > 3
-                            ? InteractiveChart(candles: candles, timeLabel: (timestamp, visibleDataCount) {
-                              var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
-                              return date.hour.toString() + ":" + date.minute.toString() + ":" + date.second.toString();
-                            },)
-                            : const Center(child: Text("No Data"))),
-                  ),
-                ],
-              );
-            }).toList(),
-          );
         } else if (state is CoinError) {
           return Center(child: Text('Error: ${state.message}'));
         } else {
-          return Center(child: CircularProgressIndicator());
+          if (state is CoinLoaded) {
+            coinMap = state.coinMap;
+          } else if (state is CoinUpdateInterval) {
+            intervalMin = state.interval.inMinutes;
+          }
+          return Column(
+            children: [
+              ToggleSwitch(
+                initialLabelIndex: intervalIdx,
+                totalSwitches: 3,
+                labels: ['1 min', '5 min', '10 min'],
+                onToggle: (index) {
+                  intervalIdx = index ?? 0;
+                  switch (index) {
+                    case 0:
+                      _cubit.updateInterval(const Duration(minutes: 1));
+                      break;
+                    case 1:
+                      _cubit.updateInterval(const Duration(minutes: 5));
+                      break;
+                    case 2:
+                      _cubit.updateInterval(const Duration(minutes: 10));
+                      break;
+                    default:
+                  }
+                },
+              ),
+              Expanded(
+                child: ListView(
+                  children: coinMap.entries.map((entry) {
+                    var candles = _cubit.getCandleDataList(
+                        entry.value.id, Duration(minutes: intervalMin));
+                    return ExpansionTile(
+                      title: Text(entry.key.toUpperCase()),
+                      subtitle: RichText(
+                        text: TextSpan(children: [
+                          TextSpan(
+                            text: 'Price: \$${entry.value.priceUsd} ',
+                          ),
+                          TextSpan(
+                            style: TextStyle(
+                                color: entry.value.changePrice > 0
+                                    ? Colors.green
+                                    : Colors.red),
+                            text:
+                                '${entry.value.changePrice > 0 ? '+' : ''} ${entry.value.changePrice.toStringAsFixed(6)}',
+                          )
+                        ]),
+                      ),
+                      children: [
+                        SizedBox(
+                          height: 400,
+                          child: Padding(
+                              padding: const EdgeInsets.all(20.0),
+                              child: candles.length > 3
+                                  ? InteractiveChart(
+                                      candles: candles,
+                                      timeLabel: (timestamp, visibleDataCount) {
+                                        var date =
+                                            DateTime.fromMillisecondsSinceEpoch(
+                                                timestamp);
+                                        return date.hour.toString() +
+                                            ":" +
+                                            date.minute.toString() +
+                                            ":" +
+                                            "00";
+                                      },
+                                    )
+                                  : const Center(child: Text("No Data"))),
+                        ),
+                      ],
+                    );
+                  }).toList(),
+                ),
+              ),
+            ],
+          );
         }
       },
     );
