@@ -26,6 +26,7 @@ class CoinCubit extends Cubit<CoinState> {
   }
 
   Future<void> _initCoinInfo() async {
+    emit(CoinLoading());
     var infoMap = await Api().getCoinInfoList();
     for (var info in infoMap!['data']) {
       var coinInfo = CoinInfo.fromJson(info);
