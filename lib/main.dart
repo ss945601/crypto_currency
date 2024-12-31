@@ -23,7 +23,12 @@ class MyApp extends StatelessWidget {
         scheme: FlexScheme.deepBlue,
       ),
       // The Mandy red, dark theme.
-      darkTheme: FlexThemeData.dark(scheme: FlexScheme.mandyRed),
+      darkTheme:
+          FlexThemeData.dark(scheme: FlexScheme.deepBlue, useMaterial3: true)
+              .copyWith(
+                  appBarTheme: AppBarTheme(
+                      color: const Color.fromARGB(255, 50, 54, 56)
+                          .withOpacity(0.8))),
       // Use dark or light theme based on system setting.
       themeMode: ThemeMode.dark,
       home: MultiBlocProvider(providers: [
@@ -102,7 +107,10 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: BlocProvider(
         create: (context) => coinCubit,
-        child: _currentScreen,
+        child: Container(
+            padding: const EdgeInsets.all(6),
+            color: Colors.blueGrey[800],
+            child: _currentScreen),
       ),
     );
   }

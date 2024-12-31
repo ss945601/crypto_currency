@@ -52,44 +52,59 @@ class PriceScreen extends StatelessWidget {
                   children: coinMap.entries.map((entry) {
                     var candles = cubit.getCandleDataList(
                         entry.value.id, Duration(minutes: intervalMin));
-                    return ExpansionTile(
-                      title: Text(entry.key.toUpperCase()),
-                      subtitle: RichText(
-                        text: TextSpan(children: [
-                          TextSpan(
-                            text: 'Price: \$${entry.value.priceUsd} ',
-                          ),
-                          TextSpan(
-                            style: TextStyle(
-                                color: entry.value.changePrice > 0
-                                    ? Colors.green
-                                    : Colors.red),
-                            text:
-                                '${entry.value.changePrice > 0 ? '+' : ''} ${entry.value.changePrice.toStringAsFixed(6)}',
-                          )
-                        ]),
-                      ),
-                      children: [
-                        SizedBox(
-                          height: 400,
-                          child: Padding(
-                              padding: const EdgeInsets.all(50.0),
-                              child: candles.length > 3
-                                  ? InteractiveChart(
-                                      candles: candles,
-                                      priceLabel:(price) {
-                                        return price.toStringAsFixed(5);
-                                      },
-                                      timeLabel: (timestamp, visibleDataCount) {
-                                        var date =
-                                            DateTime.fromMillisecondsSinceEpoch(
-                                                timestamp);
-                                        return "${date.hour}:${date.minute}:00";
-                                      },
-                                    )
-                                  : const Center(child: Text("No Data"))),
+                    return Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: Card(
+                        elevation: 0,
+                        color: Colors.blueGrey[900]?.withOpacity(0.6),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                      ],
+                        clipBehavior: Clip.antiAlias,
+                        margin: EdgeInsets.zero,
+                        child: ExpansionTile(
+                          backgroundColor: Colors.blueGrey[900],
+                          title: Text(entry.key.toUpperCase()),
+                          subtitle: RichText(
+                            text: TextSpan(children: [
+                              TextSpan(
+                                text: 'Price: \$${entry.value.priceUsd} ',
+                              ),
+                              TextSpan(
+                                style: TextStyle(
+                                    color: entry.value.changePrice > 0
+                                        ? Colors.green
+                                        : Colors.red),
+                                text:
+                                    '${entry.value.changePrice > 0 ? '+' : ''} ${entry.value.changePrice.toStringAsFixed(6)}',
+                              )
+                            ]),
+                          ),
+                          children: [
+                            SizedBox(
+                              height: 400,
+                              child: Padding(
+                                  padding: const EdgeInsets.all(50.0),
+                                  child: candles.length > 3
+                                      ? InteractiveChart(
+                                          key: UniqueKey(),
+                                          candles: candles,
+                                          priceLabel: (price) {
+                                            return price.toStringAsFixed(5);
+                                          },
+                                          timeLabel:
+                                              (timestamp, visibleDataCount) {
+                                            var date = DateTime
+                                                .fromMillisecondsSinceEpoch(
+                                                    timestamp);
+                                            return "${date.hour}:${date.minute}:00";
+                                          },
+                                        )
+                                      : const Center(child: Text("No Data"))),
+                            ),
+                          ],
+                        ),
+                      ),
                     );
                   }).toList(),
                 ),
