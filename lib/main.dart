@@ -1,5 +1,7 @@
 import 'package:crypto_currency/cubit/coin_cubit.dart';
+import 'package:crypto_currency/cubit/setting_cubit.dart';
 import 'package:crypto_currency/pages/price_screen.dart';
+import 'package:crypto_currency/pages/setting_page.dart';
 import 'package:crypto_currency/utils/isar_db.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
@@ -17,12 +19,18 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Crypto Currency',
-      theme: FlexThemeData.light(scheme: FlexScheme.deepBlue,),
+      theme: FlexThemeData.light(
+        scheme: FlexScheme.deepBlue,
+      ),
       // The Mandy red, dark theme.
       darkTheme: FlexThemeData.dark(scheme: FlexScheme.mandyRed),
       // Use dark or light theme based on system setting.
       themeMode: ThemeMode.dark,
-      home: MyHomePage(),
+      home: MultiBlocProvider(providers: [
+        BlocProvider(
+          create: (context) => SettingCubit(),
+        ),
+      ], child: MyHomePage()),
     );
   }
 }
@@ -34,7 +42,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   Widget _currentScreen = PriceScreen();
-
+  CoinCubit coinCubit = CoinCubit();
   void _switchScreen(Widget screen) {
     setState(() {
       _currentScreen = screen;
@@ -45,7 +53,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Crypto Currency'),
+        title: const Text('Crypto Currency'),
         centerTitle: true,
       ),
       drawer: Drawer(
@@ -58,27 +66,42 @@ class _MyHomePageState extends State<MyHomePage> {
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.primaryContainer,
               ),
-              child: Center(
+              child: const Center(
                 child: Text(
                   'Crypto Menu',
                 ),
               ),
             ),
-            Expanded(
-              child: ListTile(
-                leading: Icon(Icons.attach_money),
-                title: Text('Current Price'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _switchScreen(PriceScreen());
-                },
-              ),
+            ListTile(
+              leading: const Icon(Icons.wallet),
+              title: const Text('My wallet'),
+              onTap: () {
+                Navigator.pop(context);
+                _switchScreen(Container());
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.attach_money),
+              title: const Text('Coin Chart'),
+              onTap: () {
+                Navigator.pop(context);
+                coinCubit.refresh();
+                _switchScreen(PriceScreen());
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.settings),
+              title: const Text('Setting'),
+              onTap: () {
+                Navigator.pop(context);
+                _switchScreen(const SettingPage());
+              },
             ),
           ],
         ),
       ),
       body: BlocProvider(
-        create: (context) => CoinCubit(),
+        create: (context) => coinCubit,
         child: _currentScreen,
       ),
     );

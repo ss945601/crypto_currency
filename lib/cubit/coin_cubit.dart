@@ -3,6 +3,8 @@ import 'dart:developer';
 import 'package:bloc/bloc.dart';
 import 'package:crypto_currency/class/coin.dart';
 import 'package:crypto_currency/class/coin_data.dart';
+import 'package:crypto_currency/class/setting.dart';
+import 'package:crypto_currency/cubit/setting_cubit.dart';
 import 'package:crypto_currency/http/api.dart';
 import 'package:crypto_currency/utils/isar_db.dart';
 import 'package:equatable/equatable.dart';
@@ -28,14 +30,20 @@ class CoinCubit extends Cubit<CoinState> {
   Future<void> _initCoinInfo() async {
     emit(CoinLoading());
     var infoMap = await Api().getCoinInfoList();
+    coinsMap = {};
+    var isar = IsarDataBase().isar;
+    var trackingList = isar.settings.get(0)?.selectCoins ?? [];
     for (var info in infoMap!['data']) {
       var coinInfo = CoinInfo.fromJson(info);
-      coinsMap[coinInfo.id] = coinInfo;
-      if (coinsMap.length > 9) {
-        break;
+      if (trackingList.contains(coinInfo.id)) {
+        coinsMap[coinInfo.id] = coinInfo;
       }
     }
-    _getCoinsFromLocal();
+    if (coinsMap.isEmpty) {
+      emit(const CoinLoaded(coinMap: {}));
+    } else {
+      _getCoinsFromLocal();
+    }
   }
 
   void _getCoinsFromLocal() {
@@ -80,6 +88,7 @@ class CoinCubit extends Cubit<CoinState> {
     _channel = WebSocketChannel.connect(
       Uri.parse('wss://ws.coincap.io/prices?assets=${coinsMap.keys.join(',')}'),
     );
+    print("build coin listener");
     _channel.stream.listen((event) {
       var prices = Map<String, String>.from(json.decode(event));
       prices.forEach((key, value) {
@@ -98,6 +107,9 @@ class CoinCubit extends Cubit<CoinState> {
                 name: coin.name,
                 price: double.tryParse(value) ?? 0.0,
                 timestamp: DateTime.now());
+            if (!groupedData.keys.contains(coin.id)) {
+              groupedData[coin.id] = [];
+            }
             groupedData[coin.id]!.add(coinData);
             _.coinDatas.put(coinData); // insert & update
           }
@@ -107,9 +119,19 @@ class CoinCubit extends Cubit<CoinState> {
     });
   }
 
+  void refresh() {
+    _channel.sink.close();
+    _initCoinInfo().then(
+      (value) {
+        _buildCoinListener();
+      },
+    );
+  }
+
   @override
   Future<void> close() {
     _channel.sink.close();
+    print("close coin cubit");
     return super.close();
   }
 }

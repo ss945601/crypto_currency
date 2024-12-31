@@ -11,12 +11,12 @@ class PriceScreen extends StatelessWidget {
   var intervalMin = 1;
   @override
   Widget build(BuildContext context) {
-    var _cubit = context.read<CoinCubit>();
+    var cubit = context.read<CoinCubit>();
 
     return BlocBuilder<CoinCubit, CoinState>(
       builder: (context, state) {
         if (state is CoinLoading) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         } else if (state is CoinError) {
           return Center(child: Text('Error: ${state.message}'));
         } else {
@@ -30,18 +30,18 @@ class PriceScreen extends StatelessWidget {
               ToggleSwitch(
                 initialLabelIndex: intervalIdx,
                 totalSwitches: 3,
-                labels: ['1 min', '5 min', '10 min'],
+                labels: const ['1 min', '5 min', '10 min'],
                 onToggle: (index) {
                   intervalIdx = index ?? 0;
                   switch (index) {
                     case 0:
-                      _cubit.updateInterval(const Duration(minutes: 1));
+                      cubit.updateInterval(const Duration(minutes: 1));
                       break;
                     case 1:
-                      _cubit.updateInterval(const Duration(minutes: 5));
+                      cubit.updateInterval(const Duration(minutes: 5));
                       break;
                     case 2:
-                      _cubit.updateInterval(const Duration(minutes: 10));
+                      cubit.updateInterval(const Duration(minutes: 10));
                       break;
                     default:
                   }
@@ -50,7 +50,7 @@ class PriceScreen extends StatelessWidget {
               Expanded(
                 child: ListView(
                   children: coinMap.entries.map((entry) {
-                    var candles = _cubit.getCandleDataList(
+                    var candles = cubit.getCandleDataList(
                         entry.value.id, Duration(minutes: intervalMin));
                     return ExpansionTile(
                       title: Text(entry.key.toUpperCase()),
@@ -73,19 +73,18 @@ class PriceScreen extends StatelessWidget {
                         SizedBox(
                           height: 400,
                           child: Padding(
-                              padding: const EdgeInsets.all(20.0),
+                              padding: const EdgeInsets.all(50.0),
                               child: candles.length > 3
                                   ? InteractiveChart(
                                       candles: candles,
+                                      priceLabel:(price) {
+                                        return price.toStringAsFixed(5);
+                                      },
                                       timeLabel: (timestamp, visibleDataCount) {
                                         var date =
                                             DateTime.fromMillisecondsSinceEpoch(
                                                 timestamp);
-                                        return date.hour.toString() +
-                                            ":" +
-                                            date.minute.toString() +
-                                            ":" +
-                                            "00";
+                                        return "${date.hour}:${date.minute}:00";
                                       },
                                     )
                                   : const Center(child: Text("No Data"))),
