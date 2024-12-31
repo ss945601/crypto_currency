@@ -1,3 +1,4 @@
+import 'package:crypto_currency/class/coin.dart';
 import 'package:crypto_currency/cubit/coin_cubit.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -54,57 +55,7 @@ class PriceScreen extends StatelessWidget {
                         entry.value.id, Duration(minutes: intervalMin));
                     return Padding(
                       padding: const EdgeInsets.all(4.0),
-                      child: Card(
-                        elevation: 0,
-                        color: Colors.blueGrey[900]?.withOpacity(0.6),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        clipBehavior: Clip.antiAlias,
-                        margin: EdgeInsets.zero,
-                        child: ExpansionTile(
-                          backgroundColor: Colors.blueGrey[900],
-                          title: Text(entry.key.toUpperCase()),
-                          subtitle: RichText(
-                            text: TextSpan(children: [
-                              TextSpan(
-                                text: 'Price: \$${entry.value.priceUsd} ',
-                              ),
-                              TextSpan(
-                                style: TextStyle(
-                                    color: entry.value.changePrice > 0
-                                        ? Colors.green
-                                        : Colors.red),
-                                text:
-                                    '${entry.value.changePrice > 0 ? '+' : ''} ${entry.value.changePrice.toStringAsFixed(6)}',
-                              )
-                            ]),
-                          ),
-                          children: [
-                            SizedBox(
-                              height: 400,
-                              child: Padding(
-                                  padding: const EdgeInsets.all(50.0),
-                                  child: candles.length > 3
-                                      ? InteractiveChart(
-                                          key: UniqueKey(),
-                                          candles: candles,
-                                          priceLabel: (price) {
-                                            return price.toStringAsFixed(5);
-                                          },
-                                          timeLabel:
-                                              (timestamp, visibleDataCount) {
-                                            var date = DateTime
-                                                .fromMillisecondsSinceEpoch(
-                                                    timestamp);
-                                            return "${date.hour}:${date.minute}:00";
-                                          },
-                                        )
-                                      : const Center(child: Text("No Data"))),
-                            ),
-                          ],
-                        ),
-                      ),
+                      child: _buildCoinCard(entry, candles),
                     );
                   }).toList(),
                 ),
@@ -113,6 +64,70 @@ class PriceScreen extends StatelessWidget {
           );
         }
       },
+    );
+  }
+
+  Card _buildCoinCard(
+      MapEntry<dynamic, dynamic> entry, List<CandleData> candles) {
+    return Card(
+      elevation: 0,
+      color: Colors.blueGrey[900]?.withOpacity(0.6),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+      ),
+      clipBehavior: Clip.antiAlias,
+      margin: EdgeInsets.zero,
+      child: ExpansionTile(
+        backgroundColor: Colors.blueGrey[900],
+        title: Text(entry.key.toUpperCase()),
+        subtitle: Row(
+          children: [
+            Expanded(
+              child: RichText(
+                text: TextSpan(children: [
+                  TextSpan(
+                    text: 'Price: \$${entry.value.priceUsd} ',
+                  ),
+                  TextSpan(
+                    style: TextStyle(
+                        color: entry.value.changePrice > 0
+                            ? Colors.green
+                            : Colors.red),
+                    text:
+                        '${entry.value.changePrice > 0 ? '+' : ''} ${entry.value.changePrice.toStringAsFixed(6)}',
+                  )
+                ]),
+              ),
+            ),
+            Expanded(
+                child: SizedBox(
+                    height: 50,
+                    child: LineChart(
+                        _buildLineChartData(entry.value.priceHistory))))
+          ],
+        ),
+        children: [
+          SizedBox(
+            height: 400,
+            child: Padding(
+                padding: const EdgeInsets.all(50.0),
+                child: candles.length > 3
+                    ? InteractiveChart(
+                        key: UniqueKey(),
+                        candles: candles,
+                        priceLabel: (price) {
+                          return price.toStringAsFixed(5);
+                        },
+                        timeLabel: (timestamp, visibleDataCount) {
+                          var date =
+                              DateTime.fromMillisecondsSinceEpoch(timestamp);
+                          return "${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}:00";
+                        },
+                      )
+                    : const Center(child: Text("No Data"))),
+          ),
+        ],
+      ),
     );
   }
 
@@ -145,43 +160,18 @@ class PriceScreen extends StatelessWidget {
           dotData: FlDotData(show: false),
         ),
       ],
-      titlesData: FlTitlesData(
+      titlesData: const FlTitlesData(
         bottomTitles: AxisTitles(
-          sideTitles: SideTitles(
-            reservedSize: 50,
-            showTitles: true,
-            interval: maxX != minX
-                ? (maxX - minX) / 5
-                : null, // Dynamically adjust interval
-            getTitlesWidget: (value, _) {
-              final date = DateTime.fromMillisecondsSinceEpoch(value.toInt());
-              return Text(
-                "${date.hour}:${date.minute}:${date.second}",
-                style: TextStyle(fontSize: 14),
-              );
-            },
-          ),
-        ),
-        topTitles: const AxisTitles(
           sideTitles: SideTitles(showTitles: false), // Hide left Y-axis
         ),
-        leftTitles: const AxisTitles(
+        topTitles: AxisTitles(
+          sideTitles: SideTitles(showTitles: false), // Hide left Y-axis
+        ),
+        leftTitles: AxisTitles(
           sideTitles: SideTitles(showTitles: false), // Hide left Y-axis
         ),
         rightTitles: AxisTitles(
-          sideTitles: SideTitles(
-            reservedSize: 50,
-            showTitles: true,
-            interval: maxY != minY
-                ? (maxY - minY) / 5
-                : null, // Dynamically adjust interval
-            getTitlesWidget: (value, _) {
-              return Text(
-                value.toStringAsFixed(2),
-                style: TextStyle(fontSize: 10),
-              );
-            },
-          ),
+          sideTitles: SideTitles(showTitles: false), // Hide left Y-axis
         ),
       ),
       gridData: FlGridData(show: true),
