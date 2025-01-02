@@ -56,61 +56,67 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Crypto Currency'),
-        centerTitle: true,
-      ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              margin: EdgeInsets.zero,
-              padding: EdgeInsets.zero,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
-              ),
-              child: const Center(
-                child: Text(
-                  'Crypto Menu',
+    return BlocListener<SettingCubit, SettingState>(
+      listener: (context, state) {
+        if (state is SettingUpdateCoinList) {
+          coinCubit.refresh();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Crypto Currency'),
+          centerTitle: true,
+        ),
+        drawer: Drawer(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              DrawerHeader(
+                margin: EdgeInsets.zero,
+                padding: EdgeInsets.zero,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                ),
+                child: const Center(
+                  child: Text(
+                    'Crypto Menu',
+                  ),
                 ),
               ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.wallet),
-              title: const Text('My wallet'),
-              onTap: () {
-                Navigator.pop(context);
-                _switchScreen(Container());
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.attach_money),
-              title: const Text('Coin Chart'),
-              onTap: () {
-                Navigator.pop(context);
-                coinCubit.refresh();
-                _switchScreen(PriceScreen());
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.settings),
-              title: const Text('Setting'),
-              onTap: () {
-                Navigator.pop(context);
-                _switchScreen(const SettingPage());
-              },
-            ),
-          ],
+              ListTile(
+                leading: const Icon(Icons.wallet),
+                title: const Text('My wallet'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _switchScreen(Container());
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.attach_money),
+                title: const Text('Coin Chart'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _switchScreen(PriceScreen());
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.settings),
+                title: const Text('Setting'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _switchScreen(const SettingPage());
+                },
+              ),
+            ],
+          ),
         ),
-      ),
-      body: BlocProvider(
-        create: (context) => coinCubit,
-        child: Container(
-            padding: const EdgeInsets.all(6),
-            color: Colors.blueGrey[800],
-            child: _currentScreen),
+        body: BlocProvider(
+          create: (context) => coinCubit,
+          child: Container(
+              padding: const EdgeInsets.all(6),
+              color: Colors.blueGrey[800],
+              child: _currentScreen),
+        ),
       ),
     );
   }

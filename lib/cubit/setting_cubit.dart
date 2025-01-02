@@ -40,5 +40,6 @@ class SettingCubit extends Cubit<SettingState> {
       var tmp = Setting(id: 0, selectCoins: coins);
       _.settings.put(tmp);
     });
+    emit(SettingUpdateCoinList());
   }
 }
