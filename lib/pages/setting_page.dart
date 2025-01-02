@@ -1,6 +1,7 @@
 import 'package:crypto_currency/cubit/coin_cubit.dart';
 import 'package:crypto_currency/cubit/setting_cubit.dart';
 import 'package:crypto_currency/main.dart';
+import 'package:crypto_currency/widgets/loading_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:isar/isar.dart';
@@ -16,7 +17,7 @@ class SettingPage extends StatelessWidget {
     return BlocBuilder<SettingCubit, SettingState>(
       builder: (context, state) {
         if (state is SettingLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return const LoadingWidget();
         } else {
           return ListView(padding: EdgeInsets.all(20.0), children: [
             const Padding(

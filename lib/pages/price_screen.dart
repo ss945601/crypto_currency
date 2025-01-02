@@ -1,5 +1,6 @@
 import 'package:crypto_currency/class/coin.dart';
 import 'package:crypto_currency/cubit/coin_cubit.dart';
+import 'package:crypto_currency/widgets/loading_widget.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -17,7 +18,7 @@ class PriceScreen extends StatelessWidget {
     return BlocBuilder<CoinCubit, CoinState>(
       builder: (context, state) {
         if (state is CoinLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return const LoadingWidget();
         } else if (state is CoinError) {
           return Center(child: Text('Error: ${state.message}'));
         } else {
