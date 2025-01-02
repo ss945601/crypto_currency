@@ -2,6 +2,7 @@ import 'package:crypto_currency/cubit/coin_cubit.dart';
 import 'package:crypto_currency/cubit/setting_cubit.dart';
 import 'package:crypto_currency/pages/price_screen.dart';
 import 'package:crypto_currency/pages/setting_page.dart';
+import 'package:crypto_currency/pages/wallet_page.dart';
 import 'package:crypto_currency/utils/isar_db.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
@@ -85,10 +86,10 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               ListTile(
                 leading: const Icon(Icons.wallet),
-                title: const Text('My wallet'),
+                title: const Text('My wallets'),
                 onTap: () {
                   Navigator.pop(context);
-                  _switchScreen(Container());
+                  _switchScreen(WalletPage());
                 },
               ),
               ListTile(
