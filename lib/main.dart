@@ -1,5 +1,6 @@
 import 'package:crypto_currency/cubit/coin_cubit.dart';
 import 'package:crypto_currency/cubit/setting_cubit.dart';
+import 'package:crypto_currency/pages/license_page.dart';
 import 'package:crypto_currency/pages/price_screen.dart';
 import 'package:crypto_currency/pages/setting_page.dart';
 import 'package:crypto_currency/pages/wallet_page.dart';
@@ -69,8 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
           centerTitle: true,
         ),
         drawer: Drawer(
-          child: ListView(
-            padding: EdgeInsets.zero,
+          child: Column(
             children: [
               DrawerHeader(
                 margin: EdgeInsets.zero,
@@ -106,6 +106,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 onTap: () {
                   Navigator.pop(context);
                   _switchScreen(const SettingPage());
+                },
+              ),
+              const Spacer(),
+              ListTile(
+                leading: const Icon(Icons.info),
+                title: const Text('License & Disclaimer'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _switchScreen(const LicenseAndDisclaimerPage());
                 },
               ),
             ],
