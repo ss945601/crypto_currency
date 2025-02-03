@@ -1,5 +1,6 @@
 import 'package:crypto_currency/class/coin.dart';
 import 'package:crypto_currency/cubit/coin_cubit.dart';
+import 'package:crypto_currency/widgets/history_plot_button.dart';
 import 'package:crypto_currency/widgets/loading_widget.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -80,7 +81,12 @@ class PriceScreen extends StatelessWidget {
       margin: EdgeInsets.zero,
       child: ExpansionTile(
         backgroundColor: Colors.blueGrey[900],
-        title: Text(entry.key.toUpperCase()),
+        title: Row(
+          children: [
+            Text(entry.key.toUpperCase()),
+            HistoryPlotButton(coinID: entry.key)
+          ],
+        ),
         subtitle: Row(
           children: [
             Expanded(
