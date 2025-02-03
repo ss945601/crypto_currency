@@ -21,7 +21,7 @@ class SettingCubit extends Cubit<SettingState> {
     var isar = IsarDataBase().isar;
     var tmp = isar.settings.get(0);
     selectedCoins = tmp?.selectCoins ?? [];
-    Api().getCoinInfoList().then((infoMap) {
+    Api().getAssets().then((infoMap) {
       var data = infoMap?['data'] as List<dynamic>;
       data.forEach(
         (element) {

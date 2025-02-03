@@ -29,7 +29,7 @@ class CoinCubit extends Cubit<CoinState> {
 
   Future<void> _initCoinInfo() async {
     emit(CoinLoading());
-    var infoMap = await Api().getCoinInfoList();
+    var infoMap = await Api().getAssets();
     coinsMap = {};
     var isar = IsarDataBase().isar;
     var trackingList = isar.settings.get(0)?.selectCoins ?? [];
