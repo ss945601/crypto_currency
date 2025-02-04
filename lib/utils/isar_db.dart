@@ -1,4 +1,5 @@
 import 'package:crypto_currency/class/setting.dart';
+import 'package:crypto_currency/class/trade_data.dart';
 import 'package:crypto_currency/extensions/date_extension.dart';
 import 'package:isar/isar.dart';
 
@@ -41,7 +42,7 @@ class IsarDataBase {
     await newFolder.create();
     print('Directory created: $newFolderPath');
   }
-    _isar = Isar.open(schemas: [CoinDataSchema, SettingSchema], directory: newFolderPath);
+    _isar = Isar.open(schemas: [CoinDataSchema, SettingSchema, TradeDataSchema], directory: newFolderPath);
   }
 
   Isar get isar => _isar;
