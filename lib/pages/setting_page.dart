@@ -8,9 +8,10 @@ import 'package:isar/isar.dart';
 
 class SettingPage extends StatelessWidget {
   const SettingPage({
+    this.isExpand = false,
     super.key,
   });
-
+  final bool isExpand;
   @override
   Widget build(BuildContext context) {
     var settingCubit = context.read<SettingCubit>();
@@ -19,18 +20,39 @@ class SettingPage extends StatelessWidget {
         if (state is SettingLoading) {
           return const LoadingWidget();
         } else {
-          return ListView(padding: EdgeInsets.all(20.0), children: [
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text("Tracking List", style: TextStyle(fontSize: 16),),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Wrap(
-                children: _buildCoinSetting(settingCubit.coinIDList),
+          return ListView(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.grey.withOpacity(0.2), // Change the color of the border
+                    width: 2.0, // Adjust the width of the border
+                  ),
+                  borderRadius: BorderRadius.circular(
+                      10.0), // Optional: to round the corners
+                ),
+                child: ExpansionTile(
+                  leading: const Icon(Icons.currency_bitcoin),
+                  title: const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child:
+                        Text("Tracking List", style: TextStyle(fontSize: 16)),
+                  ),
+                  initiallyExpanded:
+                      isExpand, // Set to true if you want it open by default
+                  enabled: !isExpand, //
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Wrap(
+                        children: _buildCoinSetting(settingCubit.coinIDList),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ]);
+            ],
+          );
         }
       },
     );

@@ -1,5 +1,7 @@
 import 'package:crypto_currency/class/coin.dart';
 import 'package:crypto_currency/cubit/coin_cubit.dart';
+import 'package:crypto_currency/cubit/setting_cubit.dart';
+import 'package:crypto_currency/pages/setting_page.dart';
 import 'package:crypto_currency/widgets/history_plot_button.dart';
 import 'package:crypto_currency/widgets/loading_widget.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -29,26 +31,46 @@ class PriceScreen extends StatelessWidget {
             intervalMin = state.interval.inMinutes;
           }
           return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              ToggleSwitch(
-                initialLabelIndex: intervalIdx,
-                totalSwitches: 3,
-                labels: const ['1 min', '5 min', '10 min'],
-                onToggle: (index) {
-                  intervalIdx = index ?? 0;
-                  switch (index) {
-                    case 0:
-                      cubit.updateInterval(const Duration(minutes: 1));
-                      break;
-                    case 1:
-                      cubit.updateInterval(const Duration(minutes: 5));
-                      break;
-                    case 2:
-                      cubit.updateInterval(const Duration(minutes: 10));
-                      break;
-                    default:
-                  }
-                },
+              Stack(
+                children: [
+                  Center(
+                    child: ToggleSwitch(
+                      initialLabelIndex: intervalIdx,
+                      totalSwitches: 3,
+                      labels: const ['1 min', '5 min', '10 min'],
+                      onToggle: (index) {
+                        intervalIdx = index ?? 0;
+                        switch (index) {
+                          case 0:
+                            cubit.updateInterval(const Duration(minutes: 1));
+                            break;
+                          case 1:
+                            cubit.updateInterval(const Duration(minutes: 5));
+                            break;
+                          case 2:
+                            cubit.updateInterval(const Duration(minutes: 10));
+                            break;
+                          default:
+                        }
+                      },
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          _showCoinsSetting(context);
+                        },
+                        icon: const Icon(Icons.add),
+                        label: const Text("Add Tracking Coins"),
+                      ),
+                    ),
+                  )
+                ],
               ),
               Expanded(
                 child: ListView(
@@ -65,6 +87,48 @@ class PriceScreen extends StatelessWidget {
             ],
           );
         }
+      },
+    );
+  }
+
+  Future<dynamic> _showCoinsSetting(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (_) {
+        return BlocProvider.value(
+          value: context.read<SettingCubit>(),
+          child: Dialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12)), // Rounded corners
+            child: Builder(
+              builder: (context) {
+                double screenWidth = MediaQuery.of(context).size.width;
+                double screenHeight = MediaQuery.of(context).size.height;
+
+                return SizedBox(
+                  width: screenWidth * 0.8,
+                  height: screenHeight * 0.5,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min, // Prevent extra spacing
+                    children: [
+                      const Expanded(child: SettingPage(isExpand: true,)), // Main content
+
+                      // Cancel Button
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ElevatedButton(
+                          onPressed: () =>
+                              Navigator.pop(context), // Close dialog
+                          child: const Text('Cancel'),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        );
       },
     );
   }
