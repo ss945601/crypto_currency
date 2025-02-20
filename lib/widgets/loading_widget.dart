@@ -6,6 +6,11 @@ class LoadingWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(child: Lottie.asset('assets/lotties/loading1.json', width: 100, height: 100, frameRate: const FrameRate(60)),);
+    return Container(
+      alignment: Alignment.center,
+      color: Colors.transparent,
+      child: Lottie.asset('assets/lotties/loading1.json',
+          width: 100, height: 100, frameRate: const FrameRate(60)),
+    );
   }
 }

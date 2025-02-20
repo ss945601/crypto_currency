@@ -8,12 +8,32 @@ import 'package:crypto_currency/utils/isar_db.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  _initEasyLoading();
   final repository = IsarDataBase();
   // Initialize the database
   await repository.init();
   runApp(MyApp());
+}
+
+void _initEasyLoading() {
+  EasyLoading.init();
+  EasyLoading.instance
+    ..maskType = EasyLoadingMaskType.clear
+    ..maskColor = Colors.transparent
+    ..backgroundColor = Colors.transparent
+    ..indicatorColor = Colors.white
+    ..dismissOnTap = false // Prevent accidental dismiss
+    ..userInteractions = false // Prevents user interaction
+    ..textColor = Colors.white // Customize text color
+    ..loadingStyle = EasyLoadingStyle.custom // Custom styling
+    ..dismissOnTap = false // Prevent accidental dismiss
+    ..boxShadow = [] // Ensures no shadow
+    ..contentPadding = EdgeInsets.zero // Removes extra padding
+    ..progressColor = Colors.transparent; // Ensures no progress bar background
 }
 
 class MyApp extends StatelessWidget {
@@ -24,6 +44,9 @@ class MyApp extends StatelessWidget {
       theme: FlexThemeData.light(
         scheme: FlexScheme.deepBlue,
       ),
+      builder: (context, child) {
+        return FlutterEasyLoading(child: child);
+      },
       // The Mandy red, dark theme.
       darkTheme:
           FlexThemeData.dark(scheme: FlexScheme.deepBlue, useMaterial3: true)

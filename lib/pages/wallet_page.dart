@@ -4,6 +4,7 @@ import 'package:crypto_currency/class/trade_data.dart';
 import 'package:crypto_currency/class/wallet_info.dart';
 import 'package:crypto_currency/cubit/coin_cubit.dart';
 import 'package:crypto_currency/pages/wallet_detail_page.dart';
+import 'package:crypto_currency/widgets/history_plot_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -109,10 +110,12 @@ class WalletPage extends StatelessWidget {
                                   children: [
                                     CircleAvatar(
                                         child: Text(entry.key[0].toUpperCase())),
-                                    SizedBox(width: 4),
+                                    const SizedBox(width: 4),
                                     Text(entry.key),
-                                    SizedBox(width: 4),
-                                    Text('\$${entry.value.priceUsd.toString()}')
+                                    const SizedBox(width: 4),
+                                    Text('\$${entry.value.priceUsd.toString()}'),
+                                    const SizedBox(width: 4),
+                                    HistoryPlotButton(coinID: entry.value.id)
                                   ],
                                 ),
                               );
