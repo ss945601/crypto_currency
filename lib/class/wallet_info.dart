@@ -3,6 +3,7 @@ import 'package:crypto_currency/class/trade_data.dart';
 
 class WalletInfo {
   String userID = "";
+  String userName = "";
   double usd = 0.0;
   List<CoinData> buyCoins = [];
   List<TradeData> tradeData = [];

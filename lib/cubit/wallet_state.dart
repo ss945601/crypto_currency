@@ -20,5 +20,4 @@ final class WalletUpdateList extends WalletState {
   @override
   List<Object> get props => [identityHashCode(this)];
 }
-
 final class WalletError extends WalletState {}
