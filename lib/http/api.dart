@@ -72,6 +72,25 @@ class Api {
     }
   }
 
+  // Get current prices for multiple assets by ids (comma separated)
+  Future<Map<String, dynamic>?> getPricesForAssets(List<String> ids) async {
+    try {
+      final params = <String, dynamic>{};
+      if (ids.isNotEmpty) params['ids'] = ids.join(',');
+      // CoinCap returns the same /v3/assets endpoint filtered by ids
+      var ret = await _getDio().get(
+        Domain.instance.coinGap + CoinApi.assets.value,
+        queryParameters: params,
+      );
+      if (ret.data != null) {
+        return ret.data;
+      }
+      return null;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   // Get specific asset by slug (e.g., 'bitcoin')
   Future<Map<String, dynamic>?> getCoinInfo(String slug) async {
     try {
