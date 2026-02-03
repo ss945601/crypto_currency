@@ -29,20 +29,27 @@ class CoinCubit extends Cubit<CoinState> {
 
   Future<void> _initCoinInfo() async {
     emit(CoinLoading());
-    var infoMap = await Api().getCoinInfoList();
-    coinsMap = {};
-    var isar = IsarDataBase().isar;
-    var trackingList = isar.settings.get(0)?.selectCoins ?? [];
-    for (var info in infoMap!['data']) {
-      var coinInfo = CoinInfo.fromJson(info);
-      if (trackingList.contains(coinInfo.id)) {
-        coinsMap[coinInfo.id] = coinInfo;
+    try {
+      var infoMap = await Api().getCoinInfoList();
+      coinsMap = {};
+      var isar = IsarDataBase().isar;
+      var trackingList = isar.settings.get(0)?.selectCoins ?? [];
+      if (infoMap != null && infoMap['data'] != null) {
+        for (var info in infoMap['data']) {
+          var coinInfo = CoinInfo.fromJson(info);
+          if (trackingList.contains(coinInfo.id)) {
+            coinsMap[coinInfo.id] = coinInfo;
+          }
+        }
       }
-    }
-    if (coinsMap.isEmpty) {
+      if (coinsMap.isEmpty) {
+        emit(const CoinLoaded(coinMap: {}));
+      } else {
+        _getCoinsFromLocal();
+      }
+    } catch (e) {
+      log('Error fetching coin info: $e');
       emit(const CoinLoaded(coinMap: {}));
-    } else {
-      _getCoinsFromLocal();
     }
   }
 
